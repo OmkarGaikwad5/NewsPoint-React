@@ -10,15 +10,15 @@ export default class App extends Component {
         <>
           <Navbar />
           <Routes>
-            <Route path="/" element={<News  key="general" pageSize={30} country="us" category="general" />} />
-            <Route path="/technology" element={<News key="technology" pageSize={30} country="us" category="technology" />} />
-            <Route path="/business" element={<News key="business" pageSize={30} country="us" category="business" />} />
-            <Route path="/entertainment" element={<News  key="entertainment" pageSize={30} country="us" category="entertainment" />} />
-            <Route path="/general" element={<News key="general" pageSize={30} country="us" category="general" />} />
-            <Route path="/health" element={<News key="health" pageSize={30} country="us" category="health" />} />
-            <Route path="/science" element={<News key="science" pageSize={30} country="us" category="science" />} />
-            <Route path="/sports" element={<News key="sports" pageSize={30} country="us" category="sports" />} />
-            <Route path="/about" element={<div>About Page</div>} />
+            
+            <Route path="/technology" element={<News key="technology" pageSize={20} country="us" category="technology" />} />
+            <Route path="/business" element={<News key="business" pageSize={20} country="us" category="business" />} />
+            <Route path="/entertainment" element={<News  key="entertainment" pageSize={20} country="us" category="entertainment" />} />
+            <Route path="/general" element={<News key="general" pageSize={20} country="us" category="general" />} />
+            <Route path="/health" element={<News key="health" pageSize={20} country="us" category="health" />} />
+            <Route path="/science" element={<News key="science" pageSize={20} country="us" category="science" />} />
+            <Route path="/sports" element={<News key="sports" pageSize={20} country="us" category="sports" />} />
+           
           </Routes>
         </>
       </Router>

@@ -16,6 +16,7 @@ export class News extends Component {
       loading: false,
       page: 1,
       totalResults: 0,
+      totalPages: props.totalPages
     };
     document.title = `${this.capitalizeFirstLetter(this.props.category)} - NewsPoint`;
   }
@@ -24,22 +25,24 @@ export class News extends Component {
     this.fetchArticles(this.state.page);
   }
 
-  fetchArticles = async (page) => {
+  fetchArticles = async () => {
     this.setState({ loading: true });
+  
     try {
       const { category, pageSize, country } = this.props;
+      const { page } = this.state;
+  
       const url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=c2151c0611434c948b4dc660523a7070&page=${page}&pageSize=${pageSize}`;
       const response = await fetch(url);
       const parsedData = await response.json();
-
+  
       if (parsedData.status === "ok" && parsedData.articles?.length > 0) {
-        this.setState({
-          articles: parsedData.articles,
+        this.setState((prevState) => ({
+          articles: prevState.articles.concat(parsedData.articles), // append, don't replace
           totalResults: parsedData.totalResults,
           loading: false,
-          page: page,
-          
-        });
+          page: prevState.page + 1, // increment here
+        }));
       } else {
         console.error("No articles found or invalid category.");
         this.setState({ loading: false });
@@ -49,6 +52,7 @@ export class News extends Component {
       this.setState({ loading: false });
     }
   };
+  
 
   handlePrevClick = () => {
     if (this.state.page > 1) {
@@ -65,22 +69,27 @@ export class News extends Component {
 
   render() {
     return (
-      <div className="container my-3">
+      <div className="container min-h-screen my-3">
         <h2 className="text-center mb-4">
           Top Headlines - {this.props.category.toUpperCase()}
         </h2>
+
+        {this.state.articles?.length < 1 && (
+          <Spinner/>
+        )}
+        
         {/* {this.state.loading && <Spinner />} */}
         <InfiniteScroll
           dataLength={this.state.articles.length}
-          next={this.fetchMoreData}
-          hasMore={this.state.articles.length !== this.state.totalResults}
+          next={this.fetchArticles}
+          hasMore={this.state.articles.length < this.state.totalResults}
           loader={<Spinner/>}
         >
-        <div className="row">
+        <div className="row min-h-screen">
           {
-            this.state.articles.map((ele) => (
+            this.state.articles.map((ele, i) => (
               <NewsItem
-                key={ele.url}
+                key={i}
                 title={ele.title || ""}
                 description={ele.description || ""}
                 imageUrl={ele.urlToImage}
@@ -95,28 +104,7 @@ export class News extends Component {
             ))}
         </div>
         </InfiniteScroll>
-        <div className="container d-flex justify-content-between mt-3">
-          <button
-            disabled={this.state.page <= 1}
-            type="button"
-            className="btn btn-info"
-            onClick={this.handlePrevClick}
-          >
-            &larr; Previous
-          </button>
-
-          <button
-            disabled={
-              this.state.page >=
-              Math.ceil(this.state.totalResults / (this.props.pageSize || 20))
-            }
-            type="button"
-            className="btn btn-dark"
-            onClick={this.handleNextClick}
-          >
-            Next &rarr;
-          </button>
-        </div>
+        
       </div>
     );
   }
