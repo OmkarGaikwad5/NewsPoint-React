@@ -22,50 +22,63 @@ export class News extends Component {
   }
 
   async componentDidMount() {
-    this.fetchArticles(this.state.page);
+    this.fetchArticles();
+   
   }
 
   fetchArticles = async () => {
+    console.log("Props:",this.props)
+    console.log("States:",this.state)
+    const { category, pageSize, country } = this.props;
+    const { page, articles, totalResults } = this.state;
+  
+    // Check if all articles are already fetched
+    if (articles.length >= totalResults && totalResults !== 0) return;
+  
     this.setState({ loading: true });
   
     try {
-      const { category, pageSize, country } = this.props;
-      const { page } = this.state;
-  
       const url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=c2151c0611434c948b4dc660523a7070&page=${page}&pageSize=${pageSize}`;
       const response = await fetch(url);
       const parsedData = await response.json();
   
-      if (parsedData.status === "ok" && parsedData.articles?.length > 0) {
+      if (parsedData.status === "ok") {
         this.setState((prevState) => ({
-          articles: prevState.articles.concat(parsedData.articles), // append, don't replace
+          articles: prevState.articles.concat(parsedData.articles),
           totalResults: parsedData.totalResults,
+          page: prevState.page + 1,
           loading: false,
-          page: prevState.page + 1, // increment here
         }));
       } else {
-        console.error("No articles found or invalid category.");
         this.setState({ loading: false });
-      }
+      };
+
+      console.log("Props:",this.props)
+      console.log("States:",this.state)
     } catch (error) {
       console.error("Fetch error:", error);
       this.setState({ loading: false });
     }
   };
   
+  
 
-  handlePrevClick = () => {
-    if (this.state.page > 1) {
-      this.fetchArticles(this.state.page - 1);
-    }
-  };
+  // handlePrevClick = () => {
+  //   if (this.state.page > 1) {
+  //     this.fetchArticles(this.state.page - 1);
+  //   }
+  // };
 
-  handleNextClick = () => {
-    const totalPages = Math.ceil(this.state.totalResults / this.props.pageSize);
-    if (this.state.page < totalPages) {
-      this.fetchArticles(this.state.page + 1);
-    }
-  };
+  // handleNextClick = () => {
+  //   const totalPages = Math.ceil(this.state.totalResults / this.props.pageSize);
+  //   if (this.state.page < totalPages) {
+  //     this.fetchArticles(this.state.page + 1);
+  //   }
+  // };
+
+  showConsole = () => {
+    console.log(this.state.articles.length , this.state.totalResults)
+  }
 
   render() {
     return (
@@ -83,7 +96,7 @@ export class News extends Component {
           dataLength={this.state.articles.length}
           next={this.fetchArticles}
           hasMore={this.state.articles.length < this.state.totalResults}
-          loader={<Spinner/>}
+          loader={this.state.loading && <Spinner />}
         >
         <div className="row min-h-screen">
           {

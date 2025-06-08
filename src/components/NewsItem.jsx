@@ -15,7 +15,7 @@ export class NewsItem extends Component {
           </span>
           <img
             src={
-              imageUrl || defaultUrl || "https://via.placeholder.com/300x180?text=No+Image"
+              imageUrl || defaultUrl 
             }
             onError={() => defaultUrl}
             className="card-img-top"
